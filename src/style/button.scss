@@ -10,6 +10,10 @@
     border: none;
     background-color: transparent;
     cursor: pointer;
+    &:hover {
+        box-shadow: 0 5px 20px $main-color;
+        transform: translateY(-8px);
+    }
     &__long {
         display: block;
         width: 170px;
@@ -87,5 +91,8 @@
     }
     &:hover {
         transform: translateY(-5px);
+    }
+    &:disabled{
+        filter: grayscale(.5);
     }
 }
