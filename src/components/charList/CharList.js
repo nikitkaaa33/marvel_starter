@@ -1,34 +1,41 @@
 import './charList.scss';
-import {useState, useEffect, useRef} from 'react'
-import MarvelService from '../../services/MarvelService';
+import {useState, useEffect} from 'react'
+import {Transition} from 'react-transition-group'
+import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
+
+const duration = 500;
+
+const defaultStyle = {
+  transition: `opacity ${duration}ms ease-in-out`,
+  opacity: 0,
+}
+
+const transitionStyles = {
+  entering: { opacity: 0 },
+  entered:  { opacity: 1 },
+  exiting:  { opacity: 0 },
+  exited:  { opacity: 0 },
+};
 
 const CharList = (props) => {
 
     const [charList, setCharist] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [newItemLoading, setNewItemLoading] = useState(false);
-    const [offset, setOffset] = useState(210);
+    const [offset, setOffset] = useState(193);
     const [charEnded, setCharEnded] = useState(false);
-
-
-   const marvelService = new MarvelService();
+    const {loading, error, getAllCharacters} = useMarvelService();
 
    useEffect(() => {
-        onRequest();
+        onRequest(offset, true);
    },[])
 
-    const onRequest = (offset) => {
-        onCharListLoading()
-        marvelService.getAllCharacters(offset)
-        .then(onCharListLoaded)
-        .catch(onError)
-    }
-
-    const onCharListLoading = () => {
+    const onRequest = (offset, initial) => {
+        initial ? setNewItemLoading(false) : setNewItemLoading(true)
         setNewItemLoading(true);
+        getAllCharacters(offset)
+            .then(onCharListLoaded)
     }
 
     const onCharListLoaded = (newCharList) => {
@@ -38,15 +45,9 @@ const CharList = (props) => {
         }
 
         setCharist(charList => [...charList, ...newCharList])
-        setLoading(false);
         setNewItemLoading(newItemLoading => false);
         setOffset(offset => offset + 9);
         setCharEnded(charEnded => ended)
-    }
-
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     }
 
 
@@ -57,14 +58,24 @@ const CharList = (props) => {
                 imgStyle = {'objectFit' : 'unset'};
             }
             let key = item.id;
+            let inTrans = false;
+            !loading ? inTrans = true : inTrans = false
             return (
-                <li
-                    className="char__item"
-                    key={key}
-                    onClick={() => props.onCharSelected(item.id)}>
-                        <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
-                        <div className="char__name">{item.name}</div>
-                </li>
+                <Transition in={inTrans} timeout={duration} appear>
+                    {state => (
+                        <li
+                        className="char__item"
+                        key={key}
+                        onClick={() => props.onCharSelected(item.id)}
+                        style={{
+                            ...defaultStyle,
+                            ...transitionStyles[state]
+                          }}>
+                            <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
+                            <div className="char__name">{item.name}</div>
+                        </li>
+                    )}
+                </Transition>
             )
         });
         return (
@@ -78,14 +89,13 @@ const CharList = (props) => {
         const items = renderItems(charList);
 
         const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error) ? items : null;
+        const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
         return (
             <div className="char__list">
                 {errorMessage}
                 {spinner}
-                {content}
+                {items}
                 <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}

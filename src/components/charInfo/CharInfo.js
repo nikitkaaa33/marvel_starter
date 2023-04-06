@@ -1,20 +1,18 @@
-import {Component, useState, useEffect} from 'react'
+import {useState, useEffect} from 'react'
 
 import PropTypes from 'prop-types'
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton'
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import './charInfo.scss';
 
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
 
-    const marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
         updateChar()
@@ -27,26 +25,14 @@ const CharInfo = (props) => {
             return;
         }
 
-        onCharLoading();
+        clearError();
 
-        marvelService
-        .getCharacter(charId)
-        .then(onCharLoaded)
-        .catch(onError)
+        getCharacter(charId)
+            .then(onCharLoaded)
     }
 
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
-    }
-
-    const onCharLoading = () => {
-        setLoading(true);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true)
     }
 
         const skeleton = char || loading || error ? null : <Skeleton/>;
@@ -96,7 +82,7 @@ const View = ({char}) => {
                 {
                     comics.map((item, i) => {
 
-                        if (i > 9) return;
+                        if (i > 15) return;
                         return (
                             <li key={i} className="char__comics-item">
                                 {item.name}

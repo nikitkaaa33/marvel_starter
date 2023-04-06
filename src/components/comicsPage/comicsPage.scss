@@ -1,0 +1,43 @@
+@import '../../style/variables.scss';
+
+.comics {
+    &_container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        row-gap: 55px;
+        column-gap: 40px;
+        margin-top: 49px;
+    }
+    &_item {
+        padding: 10px;
+        text-align: center;
+        &:focus, &:hover{
+            box-shadow: 0 5px 20px $main-color;
+            transform: translateY(-8px);
+        }
+        img {
+            max-width: 100%;
+            &:hover{
+                transform: scale(1.1);
+                transition: all 0.7s;
+            }
+        }
+        h2 {
+            text-align: left;
+            margin-top: 10px;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 16px;
+        }
+        p {
+            text-align: left;
+            margin-top: 5px;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 16px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+    }
+}
