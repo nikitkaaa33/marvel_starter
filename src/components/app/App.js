@@ -13,8 +13,6 @@ const SingleCharacterLayout = lazy(() => import('../pages/singleCharacterLayout/
 const SinglePage = lazy(() => import('../pages/SinglePage'));
 
 const App = () => {
-
-
     return (
         <Router>
             <div className="app">
@@ -26,7 +24,7 @@ const App = () => {
                             <Route path="/comics" element={<ComicsList/>}/>
                             <Route path="*" element={<Page404/>}/>
                             <Route path="/characters/:id" element={<SinglePage Component={SingleCharacterLayout} dataType='character'/>} />
-                            <Route path="/characters/:id" element={<SinglePage Component={SingleComicLayout} dataType='character'/>} />
+                            <Route path="/comics/:id" element={<SinglePage Component={SingleComicLayout} dataType='comic'/>} />
                         </Routes>
                     </Suspense>
                 </main>

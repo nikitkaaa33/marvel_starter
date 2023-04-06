@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet";
 
-
 import AppBanner from '../appBanner/AppBanner';
 import ComicsPage from '../comicsPage/ComicsPage';
 

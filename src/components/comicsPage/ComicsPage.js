@@ -1,19 +1,17 @@
 
 import {useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage'
 import useMarvelService from '../../services/MarvelService';
 
 import './comicsPage.scss'
-
-
+ 
 const ComicsPage = () => {
-    const {loading, error, getComics} = useMarvelService();
+    const {loading, error, getComics, process, setProcess} = useMarvelService();
     const [comicsList, setComicsList] = useState ([]);
     const [offset, setOffset] = useState(111);
-
-
 
     useEffect(() => {
         onRequest(offset)
@@ -22,6 +20,7 @@ const ComicsPage = () => {
     const onRequest = (offset) => {
         getComics(offset)
             .then(onComicsListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onComicsListLoaded = (newcomicsList) => {

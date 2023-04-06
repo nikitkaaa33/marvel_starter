@@ -1,23 +1,27 @@
-import './charList.scss';
-import {useState, useEffect} from 'react'
-import {Transition} from 'react-transition-group'
+
+import {useState, useEffect, useMemo} from 'react'
+import {CSSTransition, TransitionGroup} from 'react-transition-group'
+
 import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
-const duration = 500;
+import './charList.scss';
 
-const defaultStyle = {
-  transition: `opacity ${duration}ms ease-in-out`,
-  opacity: 0,
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting': 
+            return  <Spinner/>;
+        case 'loading':
+            return newItemLoading ? <Component /> : <Spinner/>;
+        case 'confirmed':
+            return <Component/>;
+        case 'error':
+            return <ErrorMessage/>;
+        default:
+            throw new Error('Unexpected process state');
+    }
 }
-
-const transitionStyles = {
-  entering: { opacity: 0 },
-  entered:  { opacity: 1 },
-  exiting:  { opacity: 0 },
-  exited:  { opacity: 0 },
-};
 
 const CharList = (props) => {
 
@@ -25,7 +29,7 @@ const CharList = (props) => {
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(193);
     const [charEnded, setCharEnded] = useState(false);
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
 
    useEffect(() => {
         onRequest(offset, true);
@@ -36,6 +40,7 @@ const CharList = (props) => {
         setNewItemLoading(true);
         getAllCharacters(offset)
             .then(onCharListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onCharListLoaded = (newCharList) => {
@@ -50,7 +55,6 @@ const CharList = (props) => {
         setCharEnded(charEnded => ended)
     }
 
-
     function renderItems(arr) {
         const items =  arr.map((item) => {
             let imgStyle = {'objectFit' : 'cover'};
@@ -58,44 +62,33 @@ const CharList = (props) => {
                 imgStyle = {'objectFit' : 'unset'};
             }
             let key = item.id;
-            let inTrans = false;
-            !loading ? inTrans = true : inTrans = false
+
             return (
-                <Transition in={inTrans} timeout={duration} appear>
-                    {state => (
+                <CSSTransition key={item.id} timeout={500} classNames="char__item">
                         <li
                         className="char__item"
+                        tabIndex={0}
                         key={key}
-                        onClick={() => props.onCharSelected(item.id)}
-                        style={{
-                            ...defaultStyle,
-                            ...transitionStyles[state]
-                          }}>
+                        onClick={() => props.onCharSelected(item.id)}>
                             <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
                             <div className="char__name">{item.name}</div>
                         </li>
-                    )}
-                </Transition>
+                </CSSTransition>
             )
         });
         return (
-            <ul className="char__grid">
+            <TransitionGroup className="char__grid">
                 {items}
-            </ul>
+            </TransitionGroup>
         )
     }
-
-        
-        const items = renderItems(charList);
-
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const spinner = loading && !newItemLoading ? <Spinner/> : null;
+        const elements = useMemo(() => {
+            return setContent(process, () => renderItems(charList), newItemLoading)
+        },[process])
 
         return (
             <div className="char__list">
-                {errorMessage}
-                {spinner}
-                {items}
+                {elements}
                 <button 
                 className="button button__main button__long"
                 disabled={newItemLoading}
@@ -105,7 +98,6 @@ const CharList = (props) => {
                 </button>
             </div>
         )
-
 }
 
 
