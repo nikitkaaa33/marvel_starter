@@ -9,9 +9,19 @@ import useMarvelService from '../../services/MarvelService';
 import './comicsPage.scss'
  
 const ComicsPage = () => {
-    const {loading, error, getComics, process, setProcess} = useMarvelService();
+    const {loading, error, getComics, getComicsbyNameInput} = useMarvelService();
     const [comicsList, setComicsList] = useState ([]);
-    const [offset, setOffset] = useState(111);
+    const [offset, setOffset] = useState(300);
+    const [data, setData] = useState([]);
+    const [input, setInput] = useState("");
+
+    useEffect(() => {
+        if(input === '') {
+            setData([]);
+            setInput("")
+        }
+        onComicsRequest(input)
+    }, [input])
 
     useEffect(() => {
         onRequest(offset)
@@ -20,8 +30,17 @@ const ComicsPage = () => {
     const onRequest = (offset) => {
         getComics(offset)
             .then(onComicsListLoaded)
-            .then(() => setProcess('confirmed'))
     }
+
+    const onComicsRequest = (title) => {
+        if(!title) {
+            return
+        }
+        getComicsbyNameInput(title)
+            .then(data => setData(data))
+    }
+
+    console.log(data)
 
     const onComicsListLoaded = (newcomicsList) => {
         setComicsList ([...comicsList, ...newcomicsList]);
@@ -47,12 +66,48 @@ const ComicsPage = () => {
         )
     }
 
+    function renderInput (data) {
+        let list = data.map(({id, name, thumbnail}) => {
+            return (
+                <Link to={`/comics/${id}`}>
+                    <div key={id} className='input__wrapper'>
+                        <img src={thumbnail} alt={name}/>
+                        <div className='input__desc'>{name}</div>
+                    </div>
+                </Link>
+            )
+        })
+        return (
+            <div className='input__results'>
+                    {list}
+            </div>
+        )
+    }
+
     const items = renderList(comicsList);
     const errorMessage = error ? <ErrorMessage/> : null;
     const spinner = loading  ? <Spinner/> : null;
+    const inputForm = () => {
+        return (
+            <div className='input'>
+                 <input
+                    id="comicsName" 
+                    name='comicsName' 
+                    type='text' 
+                    value={input} 
+                    onChange={(e)=> setInput(e.target.value)} 
+                    placeholder="Search your comics"/>
+                </div>
+
+            )
+    }
+    const inputResults = input ? renderInput(data) : null
+    const inputSearchForm = inputForm()
 
     return (
     <>
+            {inputSearchForm}
+            {inputResults}
             {items}
             {errorMessage}
             {spinner}

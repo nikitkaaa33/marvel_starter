@@ -6,7 +6,7 @@
         grid-template-columns: repeat(4, 1fr);
         row-gap: 55px;
         column-gap: 40px;
-        margin-top: 49px;
+        margin-top: 20px;
     }
     &_item {
         padding: 10px;
@@ -39,5 +39,48 @@
             line-height: 16px;
             color: rgba(0, 0, 0, 0.6);
         }
+    }
+}
+
+.input{
+    width: 100%;
+    background: #fff;
+    width: 100%;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    input{
+        margin-top: 20px;
+        height:40px;
+        width: 100%;
+    }
+    &__wrapper {
+        display: grid;
+        align-items: center;
+        margin: 5px;
+        padding: 5px 5px 0 5px;
+        width: 150px;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        width: 110px;
+        &:hover{
+            box-shadow: 0 5px 20px $main-color;
+            transform: translateY(-8px);
+        }
+        img {
+            position: relative;
+            height: 150px;
+            width: 110px;
+            right: 5px;
+            &:hover{
+                transform: scale(1.1);
+                transition: all 0.7s;
+            }
+        }
+    }
+    &__desc {
+        border-bottom: 1px solid rgb(207, 203, 203);
+        width: 100%;
+        height: 60px;
+        margin-top: 5px;
+        margin: 0 auto;
+        font-size: 14px;
     }
 }

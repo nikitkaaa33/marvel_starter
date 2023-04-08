@@ -58,7 +58,7 @@ const FormChar = () => {
         {errorMessage}
         {<ul className='findCharacter__results'>
             {loading && data !=='' && data.length > 3 ? <Spinner/>: renderCharacter(data)}
-            {data.length === 1 && data.length < 7 ? 'repeat please' : null}
+            {data.length > 1 && data.length < 7 ? 'repeat please' : null}
         </ul>}
     </div>
     )
