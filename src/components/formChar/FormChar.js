@@ -22,12 +22,12 @@ const FormChar = () => {
     }
 
     useEffect(()=> {
-        if(input === '') {
-            setData([]);
-            setInput("")
-        }
-        loadCharacterbyName(input)
-    },[input])
+        if(!input){
+            setData([])
+            ;setInput("")
+        }else{
+            loadCharacterbyName(input)
+        }},[input])
 
     const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
 
@@ -57,8 +57,8 @@ const FormChar = () => {
         </Formik>
         {errorMessage}
         {<ul className='findCharacter__results'>
-            {loading && data !=='' && data.length > 3 ? <Spinner/>: renderCharacter(data)}
-            {data.length > 1 && data.length < 7 ? 'repeat please' : null}
+            {loading && data.length ? <Spinner/> : renderCharacter(data)}
+            {!data.length && input && !loading ? 'there is no search character' : null}   
         </ul>}
     </div>
     )
